@@ -1,0 +1,791 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["public", "system_config"]
+}
+
+model AdminUser {
+  user_id                                                         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                                                            String?             @db.VarChar(255)
+  email                                                           String?             @db.VarChar(255)
+  password_hash                                                   String?             @db.VarChar(255)
+  role_id                                                         String?             @db.Uuid
+  role                                                            Role?               @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+  alerts_alerts_created_byToadmin_users                           Alert[]             @relation("alerts_created_byToadmin_users")
+  alerts_alerts_updated_byToadmin_users                           Alert[]             @relation("alerts_updated_byToadmin_users")
+  categories_categories_created_byToadmin_users                   Category[]          @relation("categories_created_byToadmin_users")
+  categories_categories_updated_byToadmin_users                   Category[]          @relation("categories_updated_byToadmin_users")
+  category_attributes_category_attributes_created_byToadmin_users CategoryAttribute[] @relation("category_attributes_created_byToadmin_users")
+  category_attributes_category_attributes_updated_byToadmin_users CategoryAttribute[] @relation("category_attributes_updated_byToadmin_users")
+  category_offers_category_offers_created_byToadmin_users         CategoryOffer[]     @relation("category_offers_created_byToadmin_users")
+  category_offers_category_offers_updated_byToadmin_users         CategoryOffer[]     @relation("category_offers_updated_byToadmin_users")
+  coupons_coupons_created_byToadmin_users                         Coupon[]            @relation("coupons_created_byToadmin_users")
+  coupons_coupons_updated_byToadmin_users                         Coupon[]            @relation("coupons_updated_byToadmin_users")
+  gift_vouchers                                                   GiftVoucher[]
+  offers_offers_created_byToadmin_users                           Offer[]             @relation("offers_created_byToadmin_users")
+  offers_offers_updated_byToadmin_users                           Offer[]             @relation("offers_updated_byToadmin_users")
+  order_coupons_order_coupons_created_byToadmin_users             OrderCoupon[]       @relation("order_coupons_created_byToadmin_users")
+  order_coupons_order_coupons_updated_byToadmin_users             OrderCoupon[]       @relation("order_coupons_updated_byToadmin_users")
+  product_offers_product_offers_created_byToadmin_users           ProductOffer[]      @relation("product_offers_created_byToadmin_users")
+  product_offers_product_offers_updated_byToadmin_users           ProductOffer[]      @relation("product_offers_updated_byToadmin_users")
+  product_variants_product_variants_created_byToadmin_users       ProductVariant[]    @relation("product_variants_created_byToadmin_users")
+  product_variants_product_variants_updated_byToadmin_users       ProductVariant[]    @relation("product_variants_updated_byToadmin_users")
+  products_products_created_byToadmin_users                       Product[]           @relation("products_created_byToadmin_users")
+  products_products_updated_byToadmin_users                       Product[]           @relation("products_updated_byToadmin_users")
+  shipping_methods_shipping_methods_created_byToadmin_users       ShippingMethod[]    @relation("shipping_methods_created_byToadmin_users")
+  shipping_methods_shipping_methods_updated_byToadmin_users       ShippingMethod[]    @relation("shipping_methods_updated_byToadmin_users")
+  variant_attribute_variant_attribute_created_byToadmin_users     VariantAttribute[]  @relation("variant_attribute_created_byToadmin_users")
+  variant_attribute_variant_attribute_updated_byToadmin_users     VariantAttribute[]  @relation("variant_attribute_updated_byToadmin_users")
+
+  @@map("admin_users")
+  @@schema("public")
+}
+
+model Customer {
+  customer_id         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email               String?             @db.VarChar(255)
+  password_hash       String?             @db.VarChar(255)
+  first_name          String?             @db.VarChar(255)
+  last_name           String?             @db.VarChar(255)
+  phone               String?             @db.VarChar(16)
+  is_email_verified   Boolean?
+  last_login          DateTime?           @db.Timestamp(6)
+  is_active           Boolean?            @default(true)
+  created_at          DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?           @default(now()) @db.Timestamp(6)
+  address             Address[]
+  cart_items          CartItem[]
+  orders              Order[]
+  return_requests     ReturnRequest[]
+  reviews             Review[]
+  voucher_redemptions VoucherRedemption[]
+  wishlist_items      WishlistItem[]
+  gift_vouchers       GiftVoucher[]
+
+  @@map("customers")
+  @@schema("public")
+}
+
+model Address {
+  address_id                                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id                                String?        @db.Uuid
+  address_type                               address_types?
+  street_address_1                           String?        @db.VarChar(1024)
+  street_address_2                           String?        @db.VarChar(1024)
+  city_id                                    String?        @db.Uuid
+  state_id                                   String?        @db.Uuid
+  postal_code                                String?        @db.VarChar(255)
+  country_id                                 String?        @db.Uuid
+  latitude                                   Float?
+  longitude                                  Float?
+  cities                                     City?          @relation(fields: [city_id], references: [city_id], onDelete: NoAction, onUpdate: NoAction)
+  countries                                  Country?       @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction)
+  customers                                  Customer?      @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  states                                     State?         @relation(fields: [state_id], references: [state_id], onDelete: NoAction, onUpdate: NoAction)
+  orders_orders_billing_address_idToaddress  Order[]        @relation("orders_billing_address_idToaddress")
+  orders_orders_shipping_address_idToaddress Order[]        @relation("orders_shipping_address_idToaddress")
+
+  @@map("address")
+  @@schema("public")
+}
+
+model Media {
+  media_id              String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  original_file_name    String?               @db.VarChar(255)
+  mimetype              String?               @db.VarChar(255)
+  file_name             String?               @db.VarChar(255)
+  file_path             String?               @db.VarChar(255)
+  size                  Int?
+  created_at            DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?             @default(now()) @db.Timestamp(6)
+  return_requests_media ReturnRequestMedia[]
+  review_media          ReviewMedia[]
+  categories            Category[]
+  product_variant_media ProductVariantMedia[]
+
+  @@map("media")
+  @@schema("public")
+}
+
+model Order {
+  order_id                                    String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id                                 String?             @db.Uuid
+  order_number                                String?             @db.VarChar(512)
+  status                                      order_status?
+  subtotal                                    Decimal?            @db.Decimal(15, 2)
+  tax_amount                                  Decimal?            @db.Decimal(10, 2)
+  shipping_amount                             Decimal?            @db.Decimal(15, 2)
+  discount_amount                             Decimal?            @db.Decimal(15, 2)
+  billing_address_id                          String?             @db.Uuid
+  shipping_address_id                         String?             @db.Uuid
+  notes                                       String?
+  order_items                                 OrderItem[]
+  order_shipments                             OrderShipment[]
+  address_orders_billing_address_idToaddress  Address?            @relation("orders_billing_address_idToaddress", fields: [billing_address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction)
+  customers                                   Customer?           @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  address_orders_shipping_address_idToaddress Address?            @relation("orders_shipping_address_idToaddress", fields: [shipping_address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction)
+  payments                                    Payment[]
+  voucher_redemptions                         VoucherRedemption[]
+  order_coupons                               OrderCoupon[]
+
+  @@map("orders")
+  @@schema("public")
+}
+
+model OrderItem {
+  order_item_id      String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id           String?         @db.Uuid
+  product_variant_id String?         @db.Uuid
+  product_id         String?         @db.Uuid
+  price              Decimal?        @db.Decimal(15, 2)
+  discounted_price   Decimal?        @db.Decimal(15, 2)
+  tax_amount         Decimal?        @db.Decimal(15, 2)
+  total_price        Decimal?        @db.Decimal(15, 2)
+  quantity           Int?
+  created_at         DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?       @default(now()) @db.Timestamp(6)
+  orders             Order?          @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  products           Product?        @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  product_variants   ProductVariant? @relation(fields: [product_variant_id], references: [product_variant_id], onDelete: NoAction, onUpdate: NoAction)
+  return_requests    ReturnRequest[]
+
+  @@map("order_items")
+  @@schema("public")
+}
+
+model OrderShipment {
+  shipment_id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id           String?          @db.Uuid
+  shipping_method_id String?          @db.Uuid
+  tracking_number    String?          @db.VarChar(1024)
+  carrier            String?          @db.VarChar(255)
+  status             shipment_status?
+  estimated_delivery DateTime?        @db.Date
+  actual_delivery    DateTime?        @db.Date
+  created_at         DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?        @default(now()) @db.Timestamp(6)
+  orders             Order?           @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  shipping_methods   ShippingMethod?  @relation(fields: [shipping_method_id], references: [shipping_method_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("order_shipments")
+  @@schema("public")
+}
+
+model Review {
+  review_id    String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id   String?       @db.Uuid
+  customer_id  String?       @db.Uuid
+  rating       Int?
+  title        String?       @db.VarChar(255)
+  review_text  String?
+  created_at   DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?     @default(now()) @db.Timestamp(6)
+  review_media ReviewMedia[]
+  customers    Customer?     @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  products     Product?      @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("reviews")
+  @@schema("public")
+}
+
+model ReviewMedia {
+  review_media_id String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  review_id       String?   @db.Uuid
+  media_id        String?   @db.Uuid
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+  updated_at      DateTime? @default(now()) @db.Timestamp(6)
+  media           Media?    @relation(fields: [media_id], references: [media_id], onDelete: NoAction, onUpdate: NoAction)
+  reviews         Review?   @relation(fields: [review_id], references: [review_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("review_media")
+  @@schema("public")
+}
+
+model Payment {
+  payment_id      String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id        String?          @db.Uuid
+  amount          Decimal?         @db.Decimal(15, 2)
+  payment_method  payment_methods?
+  transaction_id  String?          @db.VarChar(255)
+  payment_details Json?
+  payment_status  payment_status?
+  created_at      DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?        @default(now()) @db.Timestamp(6)
+  orders          Order?           @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("payments")
+  @@schema("public")
+}
+
+model CartItem {
+  cart_item_id       String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id        String?         @db.Uuid
+  product_variant_id String?         @db.Uuid
+  created_at         DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?       @default(now()) @db.Timestamp(6)
+  customers          Customer?       @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  product_variants   ProductVariant? @relation(fields: [product_variant_id], references: [product_variant_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("cart_items")
+  @@schema("public")
+}
+
+model ReturnRequest {
+  return_request_id     String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_item_id         String?              @db.Uuid
+  customer_id           String?              @db.Uuid
+  reason                String?
+  status                return_status?
+  admin_note            String?
+  is_approved           Boolean?             @default(false)
+  created_at            DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?            @default(now()) @db.Timestamp(6)
+  customers             Customer?            @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  order_items           OrderItem?           @relation(fields: [order_item_id], references: [order_item_id], onDelete: NoAction, onUpdate: NoAction)
+  return_requests_media ReturnRequestMedia[]
+
+  @@map("return_requests")
+  @@schema("public")
+}
+
+model ReturnRequestMedia {
+  return_request_media_id String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  return_request_id       String?        @db.Uuid
+  media_id                String?        @db.Uuid
+  created_at              DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?      @default(now()) @db.Timestamp(6)
+  media                   Media?         @relation(fields: [media_id], references: [media_id], onDelete: NoAction, onUpdate: NoAction)
+  return_requests         ReturnRequest? @relation(fields: [return_request_id], references: [return_request_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("return_requests_media")
+  @@schema("public")
+}
+
+model WishlistItem {
+  wishlist_item_id   String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id        String?         @db.Uuid
+  product_variant_id String?         @db.Uuid
+  quantity           Int?
+  created_at         DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?       @default(now()) @db.Timestamp(6)
+  customers          Customer?       @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  product_variants   ProductVariant? @relation(fields: [product_variant_id], references: [product_variant_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("wishlist_items")
+  @@schema("public")
+}
+
+model VoucherRedemption {
+  redemption_id String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  voucher_id    String?      @db.Uuid
+  customer_id   String?      @db.Uuid
+  order_id      String?      @db.Uuid
+  redeemed_at   DateTime?    @db.Date
+  created_at    DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?    @default(now()) @db.Timestamp(6)
+  customers     Customer?    @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  orders        Order?       @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  gift_vouchers GiftVoucher? @relation(fields: [voucher_id], references: [voucher_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("voucher_redemptions")
+  @@schema("public")
+}
+
+model Permission {
+  permission_id           String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  permission_name         String                  @db.VarChar(255)
+  parent                  String?                 @db.VarChar(255)
+  dependency              String?                 @db.VarChar(255)
+  created_at              DateTime?               @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?               @default(now()) @db.Timestamp(6)
+  role_permission_mapping RolePermissionMapping[]
+
+  @@unique([permission_name, parent], map: "unique_permission_name_parent")
+  @@map("permission")
+  @@schema("system_config")
+}
+
+model Role {
+  role_id                 String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  role_name               String                  @db.VarChar(255)
+  role_slug               String                  @unique @db.VarChar(255)
+  created_at              DateTime?               @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?               @default(now()) @db.Timestamp(6)
+  admin_users             AdminUser[]
+  role_permission_mapping RolePermissionMapping[]
+
+  @@map("role")
+  @@schema("system_config")
+}
+
+model RolePermissionMapping {
+  mapping_id    String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  role_id       String     @db.Uuid
+  permission_id String     @db.Uuid
+  created_at    DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?  @default(now()) @db.Timestamp(6)
+  permission    Permission @relation(fields: [permission_id], references: [permission_id], onDelete: NoAction, onUpdate: NoAction)
+  role          Role       @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([role_id, permission_id])
+  @@map("role_permission_mapping")
+  @@schema("system_config")
+}
+
+model Country {
+  country_id   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  country_name String?   @db.VarChar(255)
+  address      Address[]
+  states       State[]
+
+  @@map("countries")
+  @@schema("system_config")
+}
+
+model State {
+  state_id   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  state_name String?   @db.VarChar(255)
+  country_id String?   @db.Uuid
+  address    Address[]
+  cities     City[]
+  countries  Country?  @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("states")
+  @@schema("system_config")
+}
+
+model City {
+  city_id   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  state_id  String?   @db.Uuid
+  city_name String?   @db.VarChar(255)
+  address   Address[]
+  states    State?    @relation(fields: [state_id], references: [state_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("cities")
+  @@schema("system_config")
+}
+
+model GiftVoucher {
+  voucher_id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                  String?             @db.VarChar(255)
+  initial_amount        Decimal?            @db.Decimal(15, 2)
+  remaining_balance     Decimal?            @db.Decimal(15, 2)
+  issued_to_customer_id String?             @db.Uuid
+  issued_by_admin_id    String?             @db.Uuid
+  is_active             Boolean?
+  expires_at            DateTime?           @db.Date
+  note                  String?
+  created_at            DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?           @default(now()) @db.Timestamp(6)
+  voucher_redemptions   VoucherRedemption[]
+  admin_users           AdminUser?          @relation(fields: [issued_by_admin_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  customers             Customer?           @relation(fields: [issued_to_customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("gift_vouchers")
+  @@schema("system_config")
+}
+
+model Category {
+  category_id                                    String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_name                                  String?             @db.VarChar(255)
+  parent_id                                      String?             @db.Uuid
+  media_id                                       String?             @db.Uuid
+  is_active                                      Boolean?            @default(true)
+  created_at                                     DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at                                     DateTime?           @default(now()) @db.Timestamp(6)
+  created_by                                     String?             @db.Uuid
+  updated_by                                     String?             @db.Uuid
+  admin_users_categories_created_byToadmin_users AdminUser?          @relation("categories_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  media                                          Media?              @relation(fields: [media_id], references: [media_id], onDelete: NoAction, onUpdate: NoAction)
+  categories                                     Category?           @relation("categoriesTocategories", fields: [parent_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  other_categories                               Category[]          @relation("categoriesTocategories")
+  admin_users_categories_updated_byToadmin_users AdminUser?          @relation("categories_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  category_attributes                            CategoryAttribute[]
+  category_offers                                CategoryOffer[]
+  products                                       Product[]
+
+  @@map("categories")
+  @@schema("system_config")
+}
+
+model CategoryAttribute {
+  attribute_id                                            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_id                                             String?            @db.Uuid
+  attribute_name                                          String?            @db.VarChar(255)
+  atribute_type                                           String?            @db.VarChar(255)
+  display_sequence                                        Int?
+  is_required                                             Boolean?           @default(false)
+  created_at                                              DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at                                              DateTime?          @default(now()) @db.Timestamp(6)
+  created_by                                              String?            @db.Uuid
+  updated_by                                              String?            @db.Uuid
+  categories                                              Category?          @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_category_attributes_created_byToadmin_users AdminUser?         @relation("category_attributes_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_category_attributes_updated_byToadmin_users AdminUser?         @relation("category_attributes_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  variant_attribute                                       VariantAttribute[]
+
+  @@map("category_attributes")
+  @@schema("system_config")
+}
+
+model Product {
+  product_id                                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_id                                  String?          @db.Uuid
+  product_name                                 String?          @db.VarChar(255)
+  is_new_arrival                               Boolean?         @default(false)
+  price                                        Decimal?         @db.Decimal(15, 2)
+  discount                                     Decimal?         @db.Decimal(7, 2)
+  discounted_price                             Decimal?         @db.Decimal(15, 2)
+  stock_quantity                               Int?
+  is_product_refundable                        Boolean?         @default(false)
+  description                                  String?
+  is_active                                    Boolean?         @default(true)
+  created_at                                   DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at                                   DateTime?        @default(now()) @db.Timestamp(6)
+  created_by                                   String?          @db.Uuid
+  updated_by                                   String?          @db.Uuid
+  order_items                                  OrderItem[]
+  reviews                                      Review[]
+  inventory                                    Inventory[]
+  offers                                       Offer[]
+  product_offers                               ProductOffer[]
+  product_variants                             ProductVariant[]
+  categories                                   Category?        @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_products_created_byToadmin_users AdminUser?       @relation("products_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_products_updated_byToadmin_users AdminUser?       @relation("products_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("products")
+  @@schema("system_config")
+}
+
+model ProductVariant {
+  product_variant_id                                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id                                           String?               @db.Uuid
+  sku                                                  String?               @db.VarChar(1024)
+  price                                                Decimal?              @db.Decimal(15, 2)
+  discount                                             Decimal?              @db.Decimal(7, 2)
+  discounted_price                                     Decimal?              @db.Decimal(15, 2)
+  stock_quantity                                       Int?
+  description                                          String?
+  is_active                                            Boolean?              @default(true)
+  created_at                                           DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at                                           DateTime?             @default(now()) @db.Timestamp(6)
+  created_by                                           String?               @db.Uuid
+  updated_by                                           String?               @db.Uuid
+  cart_items                                           CartItem[]
+  order_items                                          OrderItem[]
+  wishlist_items                                       WishlistItem[]
+  product_variant_media                                ProductVariantMedia[]
+  admin_users_product_variants_created_byToadmin_users AdminUser?            @relation("product_variants_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  products                                             Product?              @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_product_variants_updated_byToadmin_users AdminUser?            @relation("product_variants_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  variant_attribute                                    VariantAttribute[]
+
+  @@map("product_variants")
+  @@schema("system_config")
+}
+
+model VariantAttribute {
+  variant_attribute_id                                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_variant_id                                    String?            @db.Uuid
+  attribute_id                                          String?            @db.Uuid
+  attribute_value                                       String?
+  created_at                                            DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at                                            DateTime?          @default(now()) @db.Timestamp(6)
+  created_by                                            String?            @db.Uuid
+  updated_by                                            String?            @db.Uuid
+  category_attributes                                   CategoryAttribute? @relation(fields: [attribute_id], references: [attribute_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_variant_attribute_created_byToadmin_users AdminUser?         @relation("variant_attribute_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  product_variants                                      ProductVariant?    @relation(fields: [product_variant_id], references: [product_variant_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_variant_attribute_updated_byToadmin_users AdminUser?         @relation("variant_attribute_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("variant_attribute")
+  @@schema("system_config")
+}
+
+model Inventory {
+  inventory_id        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id          String?            @db.Uuid
+  quantity            Int?
+  low_stock_threshold Int?
+  products            Product?           @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  inventroy_history   InventoryHistory[]
+
+  @@map("inventory")
+  @@schema("system_config")
+}
+
+model InventoryHistory {
+  history_id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  inventory_id        String?    @db.Uuid
+  quantity_change     Int?
+  low_stock_threshold Int?
+  new_quantity        Int?
+  old_quantity        Int?
+  reason              String?
+  created_at          DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?  @default(now()) @db.Timestamp(6)
+  inventory           Inventory? @relation(fields: [inventory_id], references: [inventory_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("inventroy_history")
+  @@schema("system_config")
+}
+
+model Offer {
+  offer_id                                   String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title                                      String?         @db.VarChar(255)
+  description                                String?
+  product_id                                 String?         @db.Uuid
+  discount_type                              String?         @db.VarChar(255)
+  discount_value                             Decimal?        @db.Decimal(15, 2)
+  start_date                                 DateTime?       @db.Date
+  end_date                                   DateTime?       @db.Date
+  is_active                                  Boolean?        @default(true)
+  created_at                                 DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at                                 DateTime?       @default(now()) @db.Timestamp(6)
+  created_by                                 String?         @db.Uuid
+  updated_by                                 String?         @db.Uuid
+  category_offers                            CategoryOffer[]
+  admin_users_offers_created_byToadmin_users AdminUser?      @relation("offers_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  products                                   Product?        @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_offers_updated_byToadmin_users AdminUser?      @relation("offers_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  product_offers                             ProductOffer[]
+
+  @@map("offers")
+  @@schema("system_config")
+}
+
+model ProductOffer {
+  product_offer_id                                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id                                         String?    @db.Uuid
+  offer_id                                           String?    @db.Uuid
+  created_at                                         DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at                                         DateTime?  @default(now()) @db.Timestamp(6)
+  created_by                                         String?    @db.Uuid
+  updated_by                                         String?    @db.Uuid
+  admin_users_product_offers_created_byToadmin_users AdminUser? @relation("product_offers_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  offers                                             Offer?     @relation(fields: [offer_id], references: [offer_id], onDelete: NoAction, onUpdate: NoAction)
+  products                                           Product?   @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_product_offers_updated_byToadmin_users AdminUser? @relation("product_offers_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("product_offers")
+  @@schema("system_config")
+}
+
+model Coupon {
+  coupon_id                                   String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                                        String?       @db.VarChar(255)
+  description                                 String?
+  discount_type                               String?       @db.VarChar(255)
+  discount_value                              Decimal?      @db.Decimal(15, 2)
+  min_cart_value                              Decimal?      @db.Decimal(15, 2)
+  max_uses                                    Int?
+  expires_at                                  DateTime?     @db.Timestamp(6)
+  is_active                                   Boolean?      @default(true)
+  created_at                                  DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at                                  DateTime?     @default(now()) @db.Timestamp(6)
+  created_by                                  String?       @db.Uuid
+  updated_by                                  String?       @db.Uuid
+  admin_users_coupons_created_byToadmin_users AdminUser?    @relation("coupons_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_coupons_updated_byToadmin_users AdminUser?    @relation("coupons_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  order_coupons                               OrderCoupon[]
+
+  @@map("coupons")
+  @@schema("system_config")
+}
+
+model OrderCoupon {
+  order_coupon_id                                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  coupon_id                                         String?    @db.Uuid
+  order_id                                          String?    @db.Uuid
+  discount_applied                                  Decimal?   @db.Decimal(15, 2)
+  created_at                                        DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at                                        DateTime?  @default(now()) @db.Timestamp(6)
+  created_by                                        String?    @db.Uuid
+  updated_by                                        String?    @db.Uuid
+  coupons                                           Coupon?    @relation(fields: [coupon_id], references: [coupon_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_order_coupons_created_byToadmin_users AdminUser? @relation("order_coupons_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  orders                                            Order?     @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_order_coupons_updated_byToadmin_users AdminUser? @relation("order_coupons_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("order_coupons")
+  @@schema("system_config")
+}
+
+model CategoryOffer {
+  category_offer_id                                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_id                                         String?    @db.Uuid
+  offer_id                                            String?    @db.Uuid
+  created_at                                          DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at                                          DateTime?  @default(now()) @db.Timestamp(6)
+  created_by                                          String?    @db.Uuid
+  updated_by                                          String?    @db.Uuid
+  categories                                          Category?  @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_category_offers_created_byToadmin_users AdminUser? @relation("category_offers_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  offers                                              Offer?     @relation(fields: [offer_id], references: [offer_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_category_offers_updated_byToadmin_users AdminUser? @relation("category_offers_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("category_offers")
+  @@schema("system_config")
+}
+
+model ShippingMethod {
+  shipping_method_id                                   String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                                                 String?         @db.VarChar(255)
+  description                                          String?
+  is_active                                            Boolean?        @default(true)
+  price                                                Decimal?        @db.Decimal(15, 2)
+  created_at                                           DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at                                           DateTime?       @default(now()) @db.Timestamp(6)
+  created_by                                           String?         @db.Uuid
+  updated_by                                           String?         @db.Uuid
+  order_shipments                                      OrderShipment[]
+  admin_users_shipping_methods_created_byToadmin_users AdminUser?      @relation("shipping_methods_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_shipping_methods_updated_byToadmin_users AdminUser?      @relation("shipping_methods_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("shipping_methods")
+  @@schema("system_config")
+}
+
+model ProductVariantMedia {
+  product_variant_media_id String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_variant_id       String?         @db.Uuid
+  media_id                 String?         @db.Uuid
+  created_at               DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at               DateTime?       @default(now()) @db.Timestamp(6)
+  media                    Media?          @relation(fields: [media_id], references: [media_id], onDelete: NoAction, onUpdate: NoAction)
+  product_variants         ProductVariant? @relation(fields: [product_variant_id], references: [product_variant_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("product_variant_media")
+  @@schema("system_config")
+}
+
+model Alert {
+  alert_id                                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  alert_name                                 String?    @db.VarChar(255)
+  alert_description                          String?
+  created_at                                 DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at                                 DateTime?  @default(now()) @db.Timestamp(6)
+  created_by                                 String?    @db.Uuid
+  updated_by                                 String?    @db.Uuid
+  admin_users_alerts_created_byToadmin_users AdminUser? @relation("alerts_created_byToadmin_users", fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_alerts_updated_byToadmin_users AdminUser? @relation("alerts_updated_byToadmin_users", fields: [updated_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("alerts")
+  @@schema("system_config")
+}
+
+enum order_status {
+  PENDING
+  AWAITING_PAYMENT
+  PAYMENT_FAILED
+  PAYMENT_VERIFIED
+  CONFIRMED
+  PACKING
+  SHIPPED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  COMPLETED
+  CANCELLED
+  RETURN_REQUESTED
+  RETURNED
+  REFUNDED
+  FAILED_DELIVERY
+  ON_HOLD
+
+  @@schema("public")
+}
+
+enum payment_methods {
+  CREDIT_CARD
+  DEBIT_CARD
+  WALLET
+  PAYTM
+  PHONEPE
+  GOOGLE_PAY
+  AMAZON_PAY
+  UPI
+  UPI_QR
+  NET_BANKING
+  CASH_ON_DELIVERY
+  BNPL
+  LAZYPAY
+  SIMPL
+  ZESTMONEY
+  BANK_TRANSFER
+  NEFT
+  IMPS
+  RTGS
+  RAZORPAY
+  STRIPE
+  PAYPAL
+  PHONEPE_GATEWAY
+  REWARD_POINTS
+  GIFT_CARD
+  VOUCHER
+
+  @@schema("public")
+}
+
+enum payment_status {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+  DISPUTED
+  EXPIRED
+
+  @@schema("public")
+}
+
+enum return_status {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PICKUP_SCHEDULED
+  PICKED_UP
+  IN_TRANSIT
+  RECEIVED
+  INSPECTED
+  REFUND_INITIATED
+  REFUNDED
+  EXCHANGE_INITIATED
+  COMPLETED
+  CANCELLED
+
+  @@schema("public")
+}
+
+enum shipment_status {
+  PENDING_PICKUP
+  IN_WAREHOUSE
+  DISPATCHED
+  IN_TRANSIT
+  ARRIVED_AT_HUB
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED_ATTEMPT
+  HELD
+  RETURN_INITIATED
+  RETURN_IN_TRANSIT
+  RETURNED_TO_ORIGIN
+  CANCELLED
+
+  @@schema("public")
+}
+
+enum address_types {
+  SHIPPING
+  BILLING
+
+  @@schema("system_config")
+}
