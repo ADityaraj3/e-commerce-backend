@@ -10,7 +10,7 @@ async function bootstrap() {
         origin: '*',
     });
     const config = new DocumentBuilder()
-        .setTitle('E-Com')
+        .setTitle('E-C')
         .setDescription('API documentation for E-Com backend')
         .setVersion('1.0')
         .addBearerAuth()
