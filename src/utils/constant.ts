@@ -1,0 +1,1 @@
+export const CUSTOM_LOGGER = 'CUSTOM_LOGGER';
