@@ -1,13 +1,14 @@
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
   schemas  = ["public", "system_config"]
 }
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
 
 model AdminUser {
   user_id                                                         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
