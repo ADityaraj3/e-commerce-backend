@@ -10,6 +10,8 @@ import { CategoriesModule } from './modules/admin-modules/categories/categories.
 import { AdminAuthModule } from './modules/admin-modules/admin-auth/admin-auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CategoryAttributesModule } from './modules/admin-modules/category-attributes/category-attributes.module';
+import { MediaModule } from './modules/user/media/media.module';
+import { CouponsModule } from './modules/admin-modules/coupons/coupons.module';
 
 @Module({
   imports: [
@@ -19,7 +21,9 @@ import { CategoryAttributesModule } from './modules/admin-modules/category-attri
     PrismaModule,
     CategoriesModule,
     AdminAuthModule,
-    CategoryAttributesModule
+    CategoryAttributesModule,
+    MediaModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [
