@@ -12,6 +12,10 @@ import { ConfigModule } from '@nestjs/config';
 import { CategoryAttributesModule } from './modules/admin-modules/category-attributes/category-attributes.module';
 import { MediaModule } from './modules/user/media/media.module';
 import { CouponsModule } from './modules/admin-modules/coupons/coupons.module';
+import { CategoryListingModule } from './modules/user/category-listing/category-listing.module';
+import { AlertsModule } from './modules/admin-modules/alerts/alerts.module';
+import { UserAuthModule } from './modules/user/user-auth/user-auth.module';
+import { AdminProductModule } from './modules/admin-modules/admin-product/admin-product.module';
 
 @Module({
   imports: [
@@ -24,6 +28,10 @@ import { CouponsModule } from './modules/admin-modules/coupons/coupons.module';
     CategoryAttributesModule,
     MediaModule,
     CouponsModule,
+    CategoryListingModule,
+    UserAuthModule,
+    AlertsModule,
+    AdminProductModule,
   ],
   controllers: [AppController],
   providers: [

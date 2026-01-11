@@ -17,15 +17,15 @@ export class CategoriesService {
   async create(createCategoryDto: CreateCategoryDto, userId: string) {
     try {
       // 1️⃣ Check if category already exists
-      const existing = await this.prisma.category.findFirst({
-        where: {
-          category_name: {
-            equals: createCategoryDto.category_name,
-            mode: 'insensitive', // case-insensitive match
-          },
-          is_archived: false,
-        },
-      });
+      // const existing = await this.prisma.category.findFirst({
+      //   where: {
+      //     category_name: {
+      //       equals: createCategoryDto.category_name,
+      //       mode: 'insensitive', // case-insensitive match
+      //     },
+      //     is_archived: false,
+      //   },
+      // });
 
       // 2️⃣ If exists → throw error
       // ** Things that need to be discussed: ** // What if there are 2 cateogries let say T-shirt, one for Men and other for Women
@@ -60,7 +60,7 @@ export class CategoriesService {
         },
         where: {
           is_archived: false,
-        }
+        },
       });
 
       const nestedCategories = this.buildCategoryTree(categories);
@@ -94,7 +94,11 @@ export class CategoriesService {
 
   // ✅ Update Category
 
-  async update(categoryId: string, updateCategoryDto: UpdateCategoryDto, userId: string) {
+  async update(
+    categoryId: string,
+    updateCategoryDto: UpdateCategoryDto,
+    userId: string,
+  ) {
     return this.prisma.category.update({
       where: { category_id: categoryId },
       data: {
@@ -102,7 +106,7 @@ export class CategoriesService {
         is_active: updateCategoryDto.is_active,
         parent_id: updateCategoryDto.parent_id || null,
         updated_at: new Date(),
-        updated_by: userId
+        updated_by: userId,
       },
     });
   }

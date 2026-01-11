@@ -10,10 +10,8 @@ export class AdminAuthService {
 
   async adminLogin(adminLoginDto: AdminLoginDto) {
     try {
-      const { email, password } = adminLoginDto;
-
       const admin = await this.prisma.adminUser.findFirst({
-        where: { email },
+        where: { email: adminLoginDto.email },
       });
 
       if (!admin) {

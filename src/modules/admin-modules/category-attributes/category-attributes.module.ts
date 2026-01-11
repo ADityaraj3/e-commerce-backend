@@ -4,6 +4,6 @@ import { CategoryAttributesController } from './category-attributes.controller';
 
 @Module({
   providers: [CategoryAttributesService],
-  controllers: [CategoryAttributesController]
+  controllers: [CategoryAttributesController],
 })
 export class CategoryAttributesModule {}

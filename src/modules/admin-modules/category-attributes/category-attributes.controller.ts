@@ -8,42 +8,29 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 @Controller('category-attributes')
 @ApiBearerAuth()
 export class CategoryAttributesController {
-    constructor(
-        private readonly categoryAttributesService: CategoryAttributesService
-    ) {
+  constructor(
+    private readonly categoryAttributesService: CategoryAttributesService,
+  ) {}
 
-    }
+  @Post('')
+  create(
+    @Body() createAttributeDto: CreateCategoryAttributeDto,
+    @UserId() userId: string,
+  ) {
+    return this.categoryAttributesService.create(createAttributeDto, userId);
+  }
 
-    @Post('')
-    create(
-        @Body() createAttributeDto: CreateCategoryAttributeDto,
-        @UserId() userId: string,
-    ) {
-        return this.categoryAttributesService.create(
-            createAttributeDto,
-            userId
-        )
-    }
+  @Get(':cateogry_id')
+  getCategoryAttributes(@Param('cateogry_id') cateogryId: string) {
+    return this.categoryAttributesService.getCategoryAttributes(cateogryId);
+  }
 
-    @Get(':cateogry_id')
-    getCategoryAttributes(
-        @Param('cateogry_id') cateogryId: string,
-    ) {
-        return this.categoryAttributesService.getCategoryAttributes(
-            cateogryId,
-        )
-    }
-
-    @Patch(':category_attribute_id')
-    update(
-        @Body() updateCategoryAttributeDto: UpdateCategoryAttributeDto,
-        @UserId() userId: string,
-        @Param('category_attribute_id') categoryAttributeId: string,
-    ) {
-        return this.update(
-            updateCategoryAttributeDto,
-            userId,
-            categoryAttributeId
-        )
-    }
+  @Patch(':category_attribute_id')
+  update(
+    @Body() updateCategoryAttributeDto: UpdateCategoryAttributeDto,
+    @UserId() userId: string,
+    @Param('category_attribute_id') categoryAttributeId: string,
+  ) {
+    return this.update(updateCategoryAttributeDto, userId, categoryAttributeId);
+  }
 }

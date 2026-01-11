@@ -57,9 +57,11 @@ model Customer {
   is_active           Boolean?            @default(true)
   created_at          DateTime?           @default(now()) @db.Timestamp(6)
   updated_at          DateTime?           @default(now()) @db.Timestamp(6)
+  is_deleted          Boolean?            @default(false)
   address             Address[]
   cart_items          CartItem[]
   orders              Order[]
+  otp                 otp[]
   return_requests     ReturnRequest[]
   reviews             Review[]
   voucher_redemptions VoucherRedemption[]
@@ -681,6 +683,20 @@ model Alert {
   @@schema("system_config")
 }
 
+model otp {
+  otp_id      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_for String?   @db.Uuid
+  otp         String    @db.VarChar(50)
+  otp_type    otp_type?
+  is_verified Boolean   @default(false)
+  valid_till  DateTime? @db.Timestamp(6)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  customers   Customer? @relation(fields: [created_for], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
 enum order_status {
   PENDING
   AWAITING_PAYMENT
@@ -789,4 +805,13 @@ enum address_types {
   BILLING
 
   @@schema("system_config")
+}
+
+enum otp_type {
+  MOBILE_LOGIN
+  MOBILE_SIGNUP
+  EMAIL_LOGIN
+  EMAIL_SIGNUP
+
+  @@schema("public")
 }
