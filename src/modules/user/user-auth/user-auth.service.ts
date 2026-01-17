@@ -2,10 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import * as encryption from 'src/utils/encryption.utlis';
-import { Customer, Prisma } from '@prisma/client';
+import { Customer, otp_type } from '@prisma/client';
 import { LoginSignupMobileDto } from './dto/login-signup-mobile.dto';
 import { generateOtp } from 'src/utils/helper.utils';
-import { otp_type } from '@prisma/client';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { OTP_CHANNEL } from 'src/utils/constant';
 

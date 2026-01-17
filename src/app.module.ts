@@ -16,6 +16,7 @@ import { CategoryListingModule } from './modules/user/category-listing/category-
 import { AlertsModule } from './modules/admin-modules/alerts/alerts.module';
 import { UserAuthModule } from './modules/user/user-auth/user-auth.module';
 import { AdminProductModule } from './modules/admin-modules/admin-product/admin-product.module';
+import { ProductsModule } from './modules/user/products/products.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdminProductModule } from './modules/admin-modules/admin-product/admin-
     UserAuthModule,
     AlertsModule,
     AdminProductModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [

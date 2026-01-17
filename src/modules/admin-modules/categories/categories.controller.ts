@@ -16,8 +16,8 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { UserId } from 'src/utils/decorators';
 
 @Controller('categories')
-@UseGuards(AdminAuthGuard)
-@ApiBearerAuth()
+// @UseGuards(AdminAuthGuard)
+// @ApiBearerAuth()
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
